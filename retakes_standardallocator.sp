@@ -15,18 +15,51 @@ const int rifle_choice_ct_famas = 1;
 const int rifle_choice_ct_m4a4 = 2;
 const int rifle_choice_ct_m4a1_s = 3;
 const int rifle_choice_ct_aug = 4;
+const int rifle_choice_ct_ssg08 = 5; // Anfang neuer code
+//const int rifle_choice_ct_awp = 6; 
+const int rifle_choice_ct_m249 = 6;  
+const int rifle_choice_ct_negev = 7;
+const int rifle_choice_ct_sawedoff = 8;
+const int rifle_choice_ct_mag7 = 9;
+const int rifle_choice_ct_mp5sd = 10;
+const int rifle_choice_ct_nova = 11;
+const int rifle_choice_ct_xm1014 = 12; 
+const int rifle_choice_ct_bizon = 13;
+const int rifle_choice_ct_mac10 = 14;
+const int rifle_choice_ct_mp7 = 15;
+const int rifle_choice_ct_mp9 = 16;
+const int rifle_choice_ct_p90 = 17;
+const int rifle_choice_ct_ump45 = 18;
+ // Ende neuer code
 
 const int rifle_choice_t_galil = 1;
 const int rifle_choice_t_ak47 = 2;
 const int rifle_choice_t_sg553 = 3;
+const int rifle_choice_t_ssg08 = 4; // Anfang neuer code
+//const int rifle_choice_t_awp = 5;
+const int rifle_choice_t_mp5sd = 5;
+const int rifle_choice_t_m249 = 6;  
+const int rifle_choice_t_negev = 7;
+const int rifle_choice_t_sawedoff = 8;
+const int rifle_choice_t_mag7 = 9;
+const int rifle_choice_t_nova = 10;
+const int rifle_choice_t_xm1014 = 11; 
+const int rifle_choice_t_bizon = 12;
+const int rifle_choice_t_mac10 = 13;
+const int rifle_choice_t_mp7 = 14;
+const int rifle_choice_t_mp9 = 15;
+const int rifle_choice_t_p90 = 16;
+const int rifle_choice_t_ump45 = 17;
+ // Ende neuer code
 
 const int pistol_choice_ct_hkp2000 = 1;
-const int pistol_choice_ct_usp = 7;
 const int pistol_choice_ct_p250 = 2;
 const int pistol_choice_ct_fiveseven = 3;
 const int pistol_choice_ct_cz = 4;
 const int pistol_choice_ct_deagle = 5;
 const int pistol_choice_ct_r8 = 6;
+const int pistol_choice_ct_usp = 7;
+const int pistol_choice_ct_elite = 8;
 
 const int pistol_choice_t_glock = 1;
 const int pistol_choice_t_p250 = 2;
@@ -34,6 +67,7 @@ const int pistol_choice_t_tec9 = 3;
 const int pistol_choice_t_cz = 4;
 const int pistol_choice_t_deagle = 5;
 const int pistol_choice_t_r8 = 6;
+const int pistol_choice_t_elite = 7;
 
 const int nade_price_for_hegrenade = 300;
 const int nade_price_for_flashbang = 200;
@@ -47,6 +81,7 @@ const int gun_price_for_fiveseven = 500;
 const int gun_price_for_tec9 = 500;
 const int gun_price_for_deagle = 700;
 const int gun_price_for_r8 = 800;
+const int gun_price_for_elite = 400;
 
 const int kit_price = 400;
 const int kevlar_price = 650;
@@ -82,6 +117,7 @@ Handle g_h_sm_retakes_weapon_deagle_enabled  = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_r8_enabled  = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_cz_enabled  = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_p250_enabled  = INVALID_HANDLE;
+Handle g_h_sm_retakes_weapon_elite_enabled = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_tec9_fiveseven_enabled = INVALID_HANDLE;
 Handle g_h_sm_retakes_weapon_allow_nades_on_pistol_rounds = INVALID_HANDLE;
 Handle g_h_sm_retakes_kevlar_probability_on_comp_pistol_rounds = INVALID_HANDLE;
@@ -134,12 +170,13 @@ public void OnPluginStart() {
     
     g_h_sm_retakes_weapon_helmet_enabled = CreateConVar("sm_retakes_weapon_helmet_enabled", "1", "Whether the players have helmet");
     g_h_sm_retakes_weapon_kevlar_enabled = CreateConVar("sm_retakes_weapon_kevlar_enabled", "1", "Whether the players have kevlar");
-    g_h_sm_retakes_weapon_awp_team_max = CreateConVar("sm_retakes_weapon_awp_team_max", "1", "The max number of AWP per team (0 = no awp)");
+    g_h_sm_retakes_weapon_awp_team_max = CreateConVar("sm_retakes_weapon_awp_team_max", "3", "The max number of AWP per team (0 = no awp)");
     
     g_h_sm_retakes_weapon_deagle_enabled = CreateConVar("sm_retakes_weapon_deagle_enabled", "1", "Whether the players can choose deagle");
     g_h_sm_retakes_weapon_r8_enabled = CreateConVar("sm_retakes_weapon_r8_enabled", "1", "Whether the players can choose revolver");
     g_h_sm_retakes_weapon_cz_enabled = CreateConVar("sm_retakes_weapon_cz_enabled", "1", "Whether the playres can choose CZ");
     g_h_sm_retakes_weapon_p250_enabled = CreateConVar("sm_retakes_weapon_p250_enabled", "1", "Whether the players can choose P250");
+    g_h_sm_retakes_weapon_elite_enabled = CreateConVar("sm_retakes_weapon_elite_enabled", "1", "Whether the players can choose Dual Berettas");
     g_h_sm_retakes_weapon_tec9_fiveseven_enabled = CreateConVar("sm_retakes_weapon_tec9_fiveseven_enabled", "1", "Whether the players can choose Tec9/Five seven");
     
     g_h_sm_retakes_kevlar_probability_on_comp_pistol_rounds = CreateConVar("sm_retakes_kevlar_probability_on_competitive_pistol_rounds", "6", "The probability to get kevlar for each player on competitive pistol rounds. Between 0 to 10. 0 = never, 10 = always");
@@ -151,8 +188,8 @@ public void OnPluginStart() {
 }
 
 public void OnClientConnected(int client) {
-    g_PistolchoiceCT[client] = pistol_choice_ct_hkp2000;
-    g_PistolchoiceT[client] = pistol_choice_t_glock;
+    g_PistolchoiceCT[client] = pistol_choice_ct_deagle;
+    g_PistolchoiceT[client] = pistol_choice_t_deagle;
     g_RifleChoiceCT[client] = rifle_choice_ct_m4a4;
     g_RifleChoiceT[client] = rifle_choice_t_ak47;
     g_side[client] = 0;
@@ -164,6 +201,7 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
     for (int i = 0; i < sizeof(gunsChatCommands); i++) {
         if (strcmp(args[0], gunsChatCommands[i], false) == 0) {
             if (GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) != 1 && 
+				GetConVarInt(g_h_sm_retakes_weapon_elite_enabled) != 1 &&
                 GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) != 1 &&
                 GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) != 1 && 
                 GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) != 1 && 
@@ -397,36 +435,66 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
                         primary = "weapon_galilar";
                     case rifle_choice_t_sg553:
                         primary = "weapon_sg556";
+					// restliche waffen
+					case rifle_choice_t_ssg08:
+						primary = "weapon_ssg08";
+					case rifle_choice_t_mp5sd:
+						primary = "weapon_mp5sd";
+					case rifle_choice_t_m249:
+						primary = "weapon_m249";
+					case rifle_choice_t_negev:
+						primary = "weapon_negev";
+					case rifle_choice_t_sawedoff:
+						primary = "weapon_sawedoff";
+					case rifle_choice_t_nova:
+						primary = "weapon_nova";
+					case rifle_choice_t_xm1014:
+						primary = "weapon_xm1014";
+					case rifle_choice_t_bizon:
+						primary = "weapon_bizon";
+					case rifle_choice_t_mac10:
+						primary = "weapon_mac10";
+					case rifle_choice_t_mp7:
+						primary = "weapon_mp7";
+					case rifle_choice_t_p90:
+						primary = "weapon_p90";
+					case rifle_choice_t_ump45:
+						primary = "weapon_ump45";
                 }
             }
         }
-
+		
         if (g_PistolchoiceT[client] == pistol_choice_t_p250 && GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) == 1)
-        {
+		{
             secondary = "weapon_p250";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_p250;
         }
-        else if (g_PistolchoiceT[client] == pistol_choice_t_tec9 && GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) == 1)
+		else if (g_PistolchoiceT[client] == pistol_choice_t_elite && GetConVarInt(g_h_sm_retakes_weapon_elite_enabled) == 1)
+		{
+            secondary = "weapon_elite";
+            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_elite;
+        }
+		else if (g_PistolchoiceT[client] == pistol_choice_t_tec9 && GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) == 1)
         {
             secondary = "weapon_tec9";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_tec9;
         }
-        else if (g_PistolchoiceT[client] == pistol_choice_t_cz && GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
+		else if (g_PistolchoiceT[client] == pistol_choice_t_cz && GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
         {
             secondary = "weapon_cz75a";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         }
-        else if (g_PistolchoiceT[client] == pistol_choice_t_deagle && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
+		else if (g_PistolchoiceT[client] == pistol_choice_t_deagle && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
         {
             secondary = "weapon_deagle";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_deagle;
         }
-        else if (g_PistolchoiceT[client] == pistol_choice_t_r8 && GetConVarInt(g_h_sm_retakes_weapon_r8_enabled) == 1)
+		else if (g_PistolchoiceT[client] == pistol_choice_t_r8 && GetConVarInt(g_h_sm_retakes_weapon_r8_enabled) == 1)
         {
             secondary = "weapon_revolver";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_r8;
         }
-        else
+		else
         {
             secondary = "weapon_glock";
         }
@@ -507,6 +575,30 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
                         primary = "weapon_m4a1_silencer";
                     case rifle_choice_ct_aug:
                         primary = "weapon_aug";
+					case rifle_choice_ct_mag7:
+						primary = "weapon_mag7";
+					case rifle_choice_ct_mp9:
+						primary = "weapon_mp9";
+					case rifle_choice_ct_ssg08:
+						primary = "weapon_ssg08";
+					case rifle_choice_ct_mp5sd:
+						primary = "weapon_mp5sd";
+					case rifle_choice_ct_m249:
+						primary = "weapon_m249";
+					case rifle_choice_ct_negev:
+						primary = "weapon_negev";
+					case rifle_choice_ct_nova:
+						primary = "weapon_nova";
+					case rifle_choice_ct_xm1014:
+						primary = "weapon_xm1014";
+					case rifle_choice_ct_bizon:
+						primary = "weapon_bizon";
+					case rifle_choice_ct_mp7:
+						primary = "weapon_mp7";
+					case rifle_choice_ct_p90:
+						primary = "weapon_p90";
+					case rifle_choice_ct_ump45:
+						primary = "weapon_ump45";
                 }
             }
         }
@@ -516,31 +608,36 @@ public void WeaponAllocator(ArrayList tPlayers, ArrayList ctPlayers, Bombsite bo
             secondary = "weapon_p250";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_p250;
         }
-        else if (g_PistolchoiceCT[client] == pistol_choice_ct_fiveseven && GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) == 1)
+		else if (g_PistolchoiceCT[client] == pistol_choice_ct_elite && GetConVarInt(g_h_sm_retakes_weapon_elite_enabled) == 1)
         {
+            secondary = "weapon_elite";
+            dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_elite;
+        }
+		else if (g_PistolchoiceCT[client] == pistol_choice_ct_fiveseven && GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) == 1)
+		{
             secondary = "weapon_fiveseven";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_fiveseven;
-        }
-        else if (g_PistolchoiceCT[client] == pistol_choice_ct_cz && GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
+		}
+		else if (g_PistolchoiceCT[client] == pistol_choice_ct_cz && GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
         {
             secondary = "weapon_cz75a";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_cz;
         }
-        else if (g_PistolchoiceCT[client] == pistol_choice_ct_deagle && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
+		else if (g_PistolchoiceCT[client] == pistol_choice_ct_deagle && GetConVarInt(g_h_sm_retakes_weapon_deagle_enabled) == 1)
         {
             secondary = "weapon_deagle";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_deagle;
         }
-        else if (g_PistolchoiceCT[client] == pistol_choice_ct_r8 && GetConVarInt(g_h_sm_retakes_weapon_r8_enabled) == 1)
+		else if (g_PistolchoiceCT[client] == pistol_choice_ct_r8 && GetConVarInt(g_h_sm_retakes_weapon_r8_enabled) == 1)
         {
             secondary = "weapon_revolver";
             dollars_for_mimic_competitive_pistol_rounds = dollars_for_mimic_competitive_pistol_rounds - gun_price_for_r8;
         }
-        else if (g_PistolchoiceCT[client] == pistol_choice_ct_usp)
+		else if (g_PistolchoiceCT[client] == pistol_choice_ct_usp)
         {
             secondary = "weapon_usp_silencer";
         }
-        else
+		else
         {
             secondary = "weapon_hkp2000";
         }
@@ -668,6 +765,8 @@ public void GivePistolMenuCT(int client) {
     AddMenuInt(menu, pistol_choice_ct_usp, "USP-S");
     if (GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) == 1)
         AddMenuInt(menu, pistol_choice_ct_p250, "P250");
+    if (GetConVarInt(g_h_sm_retakes_weapon_elite_enabled) == 1)
+        AddMenuInt(menu, pistol_choice_ct_elite, "Beste Wahl xD");
     if (GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) == 1)
         AddMenuInt(menu, pistol_choice_ct_fiveseven, "Fiveseven");
     if (GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
@@ -685,6 +784,8 @@ public void GivePistolMenuT(int client) {
     AddMenuInt(menu, pistol_choice_t_glock, "Glock");
     if (GetConVarInt(g_h_sm_retakes_weapon_p250_enabled) == 1)
         AddMenuInt(menu, pistol_choice_t_p250, "P250");
+	if (GetConVarInt(g_h_sm_retakes_weapon_elite_enabled) == 1)
+        AddMenuInt(menu, pistol_choice_t_elite, "Beste Wahl xD");
     if (GetConVarInt(g_h_sm_retakes_weapon_tec9_fiveseven_enabled) == 1)
         AddMenuInt(menu, pistol_choice_t_tec9, "Tec-9");
     if (GetConVarInt(g_h_sm_retakes_weapon_cz_enabled) == 1)
@@ -735,7 +836,19 @@ public void GiveWeaponMenuCT(int client) {
     AddMenuInt(menu, rifle_choice_ct_m4a4, "M4A4");
     AddMenuInt(menu, rifle_choice_ct_m4a1_s, "M4A1-S");
     AddMenuInt(menu, rifle_choice_ct_aug, "Aug");
-    DisplayMenu(menu, client, MENU_TIME_LENGTH);
+	AddMenuInt(menu, rifle_choice_ct_mag7, "SWAG-7");
+	AddMenuInt(menu, rifle_choice_ct_mp9, "MP9");
+	AddMenuInt(menu, rifle_choice_ct_ssg08, "SSG 08");
+	AddMenuInt(menu, rifle_choice_ct_mp5sd, "MP5SD");
+	AddMenuInt(menu, rifle_choice_ct_m249, "M249");
+	AddMenuInt(menu, rifle_choice_ct_negev, "Negev");
+	AddMenuInt(menu, rifle_choice_ct_nova, "Nova");
+	AddMenuInt(menu, rifle_choice_ct_xm1014, "XM1014");
+	AddMenuInt(menu, rifle_choice_ct_bizon, "Bizon");
+	AddMenuInt(menu, rifle_choice_ct_mp7, "MP7");
+	AddMenuInt(menu, rifle_choice_ct_p90, "P90");
+	AddMenuInt(menu, rifle_choice_ct_ump45, "UMP-45");
+	DisplayMenu(menu, client, MENU_TIME_LENGTH);
 }
 
 public void GiveWeaponMenuT(int client) {
@@ -744,6 +857,19 @@ public void GiveWeaponMenuT(int client) {
     AddMenuInt(menu, rifle_choice_t_galil, "Galil");
     AddMenuInt(menu, rifle_choice_t_ak47, "AK47");
     AddMenuInt(menu, rifle_choice_t_sg553, "SG553");
+	AddMenuInt(menu, rifle_choice_t_ssg08, "SSG 08");
+	AddMenuInt(menu, rifle_choice_t_mp5sd, "MP5SD");
+	AddMenuInt(menu, rifle_choice_t_m249, "M249");
+	AddMenuInt(menu, rifle_choice_t_negev, "Negev");
+	AddMenuInt(menu, rifle_choice_t_sawedoff, "Sawed-Off");
+	AddMenuInt(menu, rifle_choice_t_nova, "Nova");
+	AddMenuInt(menu, rifle_choice_t_xm1014, "XM1014");
+	AddMenuInt(menu, rifle_choice_t_bizon, "Bizon");
+	AddMenuInt(menu, rifle_choice_t_mac10, "MAC-10");
+	AddMenuInt(menu, rifle_choice_t_mp7, "MP7");
+	AddMenuInt(menu, rifle_choice_t_p90, "P90");
+	AddMenuInt(menu, rifle_choice_t_ump45, "UMP-45");
+	
     DisplayMenu(menu, client, MENU_TIME_LENGTH);
 }
 
